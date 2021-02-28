@@ -8,6 +8,8 @@ def record_audio():
         # регулирование уровня окружающего шума
         reco.adjust_for_ambient_noise(source, duration=2)
         print('Слушаю...')
+        #задержка записи
+        reco.pause_threshold = 1
         audio = reco.listen(source)
         print('Услышала')
     try:
@@ -18,6 +20,7 @@ def record_audio():
         if 'до свидания' in text or 'пока' in text:
             print('Hу пока')
             sys.exit()
+            #если не разпознается текст из аудио
     except sr.UnknownValueError:
         print('Я Вас не поняла, повторите')
         
