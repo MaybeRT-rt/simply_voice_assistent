@@ -1,0 +1,10 @@
+astroid==2.5
+isort==5.7.0
+lazy-object-proxy==1.5.2
+mccabe==0.6.1
+PyAudio==0.2.11
+pylint==2.7.1
+pyttsx3==2.90
+SpeechRecognition==3.8.1
+toml==0.10.2
+wrapt==1.12.1

@@ -1,0 +1,5 @@
+.pyc
+nlp_venv/
+.vscode/*
+__pycache__/
+text1.py
