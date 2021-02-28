@@ -3,7 +3,7 @@ import sys
 
 def record_audio():
     reco = sr.Recognizer() 
-    with sr.Microphone(sample_rate = 48000, device_index=0, chunk_size = 1024) as source:
+    with sr.Microphone(sample_rate = 48000, device_index=0, chunk_size = 1024) as source: # сначала запустить test.py, что бы понять свой device_index
         print('Готовлюсь.')
         # регулирование уровня окружающего шума
         reco.adjust_for_ambient_noise(source, duration=2)
