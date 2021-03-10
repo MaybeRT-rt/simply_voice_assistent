@@ -76,6 +76,8 @@ def say_print():
             open_search_google(textopen)
             #time.sleep(1)
             return say_print()
+        elif 'сайт' in text_command:
+            open_sites(textopen)
         elif 'видео' in text_command:
             open_search_youtube(textopen)
         elif 'wiki' in text_command or 'вики' in text_command or 'википедия' in text_command:
@@ -113,6 +115,15 @@ def open_search_google(textopen):
     say('Открываю')
     subprocess.getoutput("google-chrome-stable https://google.com/search?q="+textopen) #как реализовать открытие в разных браузерах?
 
+def open_sites(textopen):
+    if '.' not in textopen:
+        time.sleep(3)
+        say('Это не сайт')
+    else:
+        print(f'Открываю {textopen}')
+        time.sleep(2)
+        say('Открываю')
+        subprocess.getoutput("google-chrome-stable https://"+textopen) 
 
 def wiki(textopen):
     #
@@ -152,7 +163,7 @@ def get_weather(textopen):
         temper0, temper_max, temper_min = str(int(temper['temp'])), int(temper['temp_max']), int(temper['temp_min'])
         print('Средняя температура. В настоящее время: ', temper0) 
         print('Максимальная температура: ', temper_max) 
-        print('Минимальная темература: ', temper_min)
+        print('Минимальная температура: ', temper_min)
         time.sleep(2)
         say(f'Средняя темепература за день:' + temper0)
         time.sleep(2)
