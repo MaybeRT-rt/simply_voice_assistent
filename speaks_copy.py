@@ -134,10 +134,8 @@ if __name__ == '__main__':
     
 
 while True:
-    try:
-        say_print()
-    except OSError:
-        say_print()
+    say_print()
+    
 
 
 
