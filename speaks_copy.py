@@ -9,9 +9,8 @@ import subprocess
 import wikipedia
 from nltk import tokenize
 from time import strftime
-from pyowm.owm import OWM
-from pyowm.utils.config import get_default_config
-
+import requests
+import bs4
 
 reco = sr.Recognizer() 
 micro = sr.Microphone(sample_rate = 48000, device_index=0, chunk_size = 1024) 
@@ -28,9 +27,9 @@ def hello():
 def help():
     say('Давайте, я расскажу, как со мной работать')
     time.sleep(3)
-    print(('По команде "открой" - я могу искать в гугле.\nПо команде "википедия" - готова зачитать 2 прелодения.\nПо Команде " время" - подскажу который час\nПо команде "погода(город)" и выведу погоду\nПо команде "до связи" - я отключаюсь'))
-    say('По команде "открой" - я могу искать в гугле. По команде "википедия" - готова зачитать 2 предложения. Команде " время" - подскажу который час. По команде "погода(город)" и выведу погодуюю Так же команде "до связи" - я отключаюсь')
-    time.sleep(15)
+    print(('По команде "открой" - я могу искать в гугле.\nПо команде "википедия" - готова зачитать 2 прелодения.\nПо Команде " время" - подскажу который час\nПо команде "до связи" - я отключаюсь'))
+    say('По команде "открой" - я могу искать в гугле. По команде "википедия" - готова зачитать 2 предложения. Команде " время" - подскажу который час. Так же команде "до связи" - я отключаюсь')
+    time.sleep(10)
 
 
 
@@ -80,9 +79,6 @@ def say_print():
             wiki(textopen)
         elif 'который час' in text_command or 'время' in text_command:
             colortime()
-        elif 'погода' in text_command:
-            textopen = text_command.split(' ')[-1]
-            get_weather(textopen)
         elif 'до связи' in text_command or 'до свидания' in text_command:
             time.sleep(2)
             print('Hу пока')
@@ -114,37 +110,23 @@ def wiki(textopen):
         all = tokenize.sent_tokenize(wikitext)[0:3]
         all = ''.join(map(str, all))
         print(all)
-        say(all) 
-        time.sleep(25)       #
+        say(all)
+        time.sleep(20)       # продолжение работы по enter или динамическое число time.sleep
     except wikipedia.exceptions.DisambiguationError as e:
         result = e.options 
         print(result)
 
 def colortime():
-    #время
     now = strftime("%m/%d/%Y %H:%M")
     print(now)
-    time.sleep(2)
     say(now)
-    time.sleep(7)
+    time.sleep(10)
 
-def get_weather(textopen):
-# погода работает в тестовом режиме, доделана не до конца.
-    config_dict = get_default_config()
-    config_dict['language'] = 'ru' 
-    try:
-        owm = OWM('d40c1a8c5f52d5af0bad7ddb8508a452', config_dict)
-        mgr = owm.weather_manager()
-        observation =  mgr.weather_at_place(textopen)
-        w = observation.weather
-        temper = w.temperature('celsius')
-        print ('Средняя температура. В настоящее время: ', int(temper['temp'])) 
-        print ('Максимальная температура: ', int(temper['temp_max'])) 
-        print ('Минимальная темература: ', int(temper['temp_min']))
-        say('Средняя темепература за день:', (str(int(temper['temp']))))
-        time.sleep(7)
-    except (AttributeError,ValueError):
-        pass
+#def get_weather():
+#    sites = requests.get('https://sinoptik.com.ru/погода-москва')
+#    b = bs4.BeautifulSoup(sites.text, 'html.parser')
+
+
 
 if __name__ == '__main__':
    
@@ -152,7 +134,10 @@ if __name__ == '__main__':
     
 
 while True:
-    say_print()
+    try:
+        say_print()
+    except OSError:
+        say_print()
 
 
 
