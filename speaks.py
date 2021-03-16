@@ -2,20 +2,21 @@ import speech_recognition as sr #распознавение пользовате
 import sys 
 from gtts import gTTS
 import pygame.mixer
+import pyaudio
 import pydub
 import io
 import time
 import subprocess
+import webbrowser
 import wikipedia
 from nltk import tokenize
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 from time import strftime
 from pyowm.owm import OWM
 from pyowm.utils.config import get_default_config
 import settings
 
-
-reco = sr.Recognizer() 
-micro = sr.Microphone(sample_rate = 48000, device_index=0, chunk_size = 1024) 
 
 
 def hello():
@@ -27,12 +28,6 @@ def hello():
     say('Салют! Я простой голосовой ассистент - Nonename')
     time.sleep(3)
 
-def help():
-    say('Давайте, я расскажу, как со мной работать')
-    time.sleep(3)
-    print(('По команде "открой" - я могу искать в гугле.\nПо команде "википедия" - готова зачитать 2 преложения.\nПо Команде " время" - подскажу который час\nПо команде "погода(город)" и выведу погоду\nПо команде "до связи" - я отключаюсь'))
-    say('По команде "открой" - я могу искать в гугле. По команде "википедия" - готова зачитать 2 предложения. Команде " время" - подскажу который час. По команде "погода(город)" и выведу погоду. Так же команде "до связи" - я отключаюсь')
-    time.sleep(15)
 
 
 
@@ -50,11 +45,14 @@ def say(text, lang = 'ru'):
         sound.play()
 
 
-def say_print():
+reco = sr.Recognizer() 
+micro =  sr.Microphone(sample_rate = 48000, device_index=0, chunk_size=1024)
+
+def say_print(*args: tuple):
     with micro as source: # сначала запустить test.py, что бы понять свой device_index
         print('Готовлюсь к работе.')
-        # регулирование уровня окружающего шума
-        reco.adjust_for_ambient_noise(source, duration=2)
+        # регулирование уровня окружающего шума(слушает фон)
+        reco.adjust_for_ambient_noise(source, duration=2) #2
         print('Слушаю...')
         say('Слушаю...')
         #задержка записи
@@ -62,119 +60,113 @@ def say_print():
         audio = reco.listen(source)
         print('Услышала')
         say('Услышала')
+        time.sleep(3)
     try:
         # использование online-распознавания через Google 
         recognized_data = reco.recognize_google(audio, language='ru_RU')
         text_command = recognized_data.lower()
         print(f'Вы сказали: {text_command}')
-        say(f'Вы сказали' + text_command)
-        textopen = text_command.split(' ')[-1]
-        if 'помощь' in text_command:
-            time.sleep(2)
-            help()
-        elif 'открой' in text_command or 'найди' in text_command:
-            open_search_google(textopen)
-            #time.sleep(1)
-            return say_print()
-        elif 'сайт' in text_command:
-            open_sites(textopen)
-        elif 'видео' in text_command:
-            open_search_youtube(textopen)
-        elif 'wiki' in text_command or 'вики' in text_command or 'википедия' in text_command:
-            wiki(textopen)
-        elif 'который час' in text_command or 'время' in text_command or 'дата' in text_command:
-            colortime()
-        elif 'погода' in text_command:
-            get_weather(textopen)
-        elif 'до связи' in text_command or 'до свидания' in text_command:
-            time.sleep(2)
-            print('Hу пока')
-            say('Ну пока')
-            time.sleep(2)
-            sys.exit()
-            #если не разпознается текст из аудио
+        #say(f'Вы сказали: {text_command}')
+        textopen = text_command.split(' ')
+        command = textopen[0]
+        command_options = textopen[-1]
+        command_with_name(command, command_options)
     except sr.UnknownValueError:
         print('Я Вас не поняла, повторите')
         say('Я Вас не поняла, повторите')
         
-def open_search_youtube(textopen):   
+def hi_me(*args: tuple):
+    if not args[0]:
+        return
+    search_term = args[0]
+    print('И тебе привет, Человек!')
+    say('И тебе привет, Человек!')
+
+def help_u(*args: tuple):
+    if not args[0]:
+        return
+    say('Давайте, я расскажу, как со мной работать')
+    time.sleep(3)
+    print(('По команде "открой" - я могу искать в гугле.\nПо команде "википедия" - готова зачитать 2 преложения.\nПо Команде " время" - подскажу который час\nПо команде "погода(город)" и выведу погоду\nПо команде "до связи" - я отключаюсь'))
+    say('По команде "открой" - я могу искать в гугле. По команде "википедия" - готова зачитать 2 предложения. Команде " время" - подскажу который час. По команде "погода(город)" и выведу погоду. Так же команде "до связи" - я отключаюсь')
+    time.sleep(15)
+
+def open_search_youtube(*args: tuple):   
     # 
     # открыввем гугл (реализовать открытие любой ссылки позже) 
     #
-    print(f'Открываю на ютубе {textopen}')
-    time.sleep(2)
-    say('Открываю ютуб')
-    subprocess.getoutput("google-chrome-stable https://youtube.com/results?search_query="+textopen) 
-
-def open_search_google(textopen):   
+    if not args[0]:
+        return
+    search_term = args[0]
+    url = "https://www.youtube.com/results?search_query=" + search_term
+    webbrowser.open(url)
+    say(f'Открываю {search_term} на ютубе')
+   
+    
+def open_search_google(*args: tuple):   
     # 
     # открыввем гугл (реализовать открытие любой ссылки позже) 
     #
-    print(f'Открываю {textopen}')
-    time.sleep(2)
-    say('Открываю')
-    subprocess.getoutput("google-chrome-stable https://google.com/search?q="+textopen) #как реализовать открытие в разных браузерах?
+    if not args[0]:
+        return
+    search_term = args[0]
+    subprocess.getoutput("google-chrome-stable https://google.com/search?q=" + search_term) #лучше subprocess или webbrowser
+    say(f'Ищу {search_term} в гугле')
 
-def open_sites(textopen):
-    if '.' not in textopen:
-        time.sleep(3)
-        say('Это не сайт')
-    else:
-        print(f'Открываю {textopen}')
-        time.sleep(2)
-        say('Открываю')
-        subprocess.getoutput("google-chrome-stable https://"+textopen) 
-
-def wiki(textopen):
+def wiki(*args: tuple):
     #
     # Поиск по википедии
     #
     wikipedia.set_lang("ru")
+    if not args[0]:
+        return
+    search_term = args[0]
     try:
-        print(wikipedia.search(textopen, results = 5, suggestion = True))
-        wikitext = wikipedia.summary(textopen)
+        print(wikipedia.search(search_term, results = 5, suggestion = True))
+        wikitext = wikipedia.summary(search_term)
         all = tokenize.sent_tokenize(wikitext)[0:3]
         all = ''.join(map(str, all))
+        len_all = len(all)
         print(all)
-        say(all) 
-        time.sleep(25)       
+        say(all)
+        time.sleep(len_all * 0.1)      
     except wikipedia.exceptions.DisambiguationError as e:
         result = e.options 
         print(result)
 
-def colortime():
-    #время
-    now = strftime("%m/%d/%Y %H:%M")
-    print(now)
+def goodbye(*args: tuple):
+    print('Ну пока')
+    say('Ну пока')
     time.sleep(2)
-    say(now)
-    time.sleep(7)
+    sys.exit()
 
-def get_weather(textopen):
-# погода работает в тестовом режиме, доделана не до конца.
-    config_dict = get_default_config()
-    config_dict['language'] = 'ru' 
-    try:
-        owm = OWM(settings.API, config_dict)
-        mgr = owm.weather_manager()
-        observation =  mgr.weather_at_place(textopen)
-        w = observation.weather
-        temper = w.temperature('celsius')
-        temper0, temper_max, temper_min = str(int(temper['temp'])), int(temper['temp_max']), int(temper['temp_min'])
-        print('Средняя температура. В настоящее время: ', temper0) 
-        print('Максимальная температура: ', temper_max) 
-        print('Минимальная температура: ', temper_min)
-        time.sleep(2)
-        say(f'Средняя темепература за день:' + temper0)
-        time.sleep(2)
-    except:
-        pass
+    
+def command_with_name(command, *args: list):
+   
+    for key in commands.keys():
+        if command in key:
+            #fuzzw = fuzz.WRatio(key, command)
+            commands[key](*args)
+        else:
+            pass       
+
+commands = {
+    ('помоги', 'help', 'помощь'): help_u,
+    ('найди', 'открой', 'google'): open_search_google, 
+    ('видео', 'посмотреть', 'youtube' ): open_search_youtube,
+    ('вики', 'википедия', 'определение'): wiki,
+    ('чао', 'пока', 'стоп'): goodbye,
+    ('привет', 'hi', 'здравствуй'): hi_me
+
+}
 
 
 if __name__ == '__main__':
-   
+    
+
     hello()
     
 
-while True:
-    say_print()
+    while True:
+        say_print()
+        
