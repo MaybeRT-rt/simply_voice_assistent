@@ -71,7 +71,7 @@ def say_print(*args: tuple):
         #say(f'Вы сказали: {text_command}')
         textopen = text_command.split(' ')
         command = textopen[0]
-        command_options = textopen[-1] #здесь не работает:)
+        command_options = (" ".join(textopen[1:len(textopen)]))
         command_with_name(command, command_options)
     except wikipedia.exceptions.PageError:
         pass
