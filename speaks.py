@@ -71,7 +71,8 @@ def say_print(*args: tuple):
         #say(f'Вы сказали: {text_command}')
         textopen = text_command.split(' ')
         command = textopen[0]
-        command_options = textopen[-1]
+        print(" ".join(textopen[1:len(textopen)]))
+        command_options = (" ".join(textopen[1:len(textopen)]))
         command_with_name(command, command_options)
     except wikipedia.exceptions.PageError:
         pass
@@ -85,7 +86,7 @@ def hi_me(*args: tuple):
     print('И тебе привет, Человек!')
     say('И тебе привет, Человек!')
 
-def help_u(*args: tuple): # ПЕРЕПИСАТЬ!
+def help_u(*args: tuple): 
     if not args[0]:
         return
     say('Давайте, я расскажу, как со мной работать')
@@ -195,18 +196,21 @@ def command_with_name(command, *args: list):
         if command in key:
             comok = process.extractOne(command, key)
             if comok[1] >= 80:
+                print(comok)
                 commands[key](*args)
         else:
             pass  
 
 commands = {
+    ('привет', 'hi', 'здравствуй'): hi_me,
+    ('нонима', 'нима', 'нина', 'нони'): say_print,
+    ('чао', 'пока', 'стоп','пока-пока'): goodbye,
     ('помоги', 'help', 'помощь'): help_u,
     ('найди', 'открой', 'google'): open_search_google, 
     ('видео', 'посмотреть', 'youtube' ): open_search_youtube,
     ('вики', 'википедия', 'определение', 'прочитай', 'расскажи'): wiki,
     ('погода', 'прогноз'): get_weather,
-    ('чао', 'пока', 'стоп','пока-пока'): goodbye,
-    ('привет', 'hi', 'здравствуй'): hi_me
+    
 
 
 }
@@ -217,7 +221,7 @@ if __name__ == '__main__':
 
     hello()
     
-
+    
     while True:
         say_print()
         
