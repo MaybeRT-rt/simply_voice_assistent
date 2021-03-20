@@ -71,7 +71,7 @@ def say_print(*args: tuple):
         #say(f'Вы сказали: {text_command}')
         textopen = text_command.split(' ')
         command = textopen[0]
-        command_options = textopen[-1]
+        command_options = textopen[-1] #здесь не работает:)
         command_with_name(command, command_options)
     except wikipedia.exceptions.PageError:
         pass
@@ -85,7 +85,7 @@ def hi_me(*args: tuple):
     print('И тебе привет, Человек!')
     say('И тебе привет, Человек!')
 
-def help_u(*args: tuple): # ПЕРЕПИСАТЬ!
+def help_u(*args: tuple): 
     if not args[0]:
         return
     say('Давайте, я расскажу, как со мной работать')
