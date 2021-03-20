@@ -1,5 +1,6 @@
 import speech_recognition as sr #распознавение пользовательской речи (speech to text)
 import sys 
+from termcolor import colored
 from gtts import gTTS
 import pygame.mixer
 import pyaudio
@@ -19,10 +20,11 @@ import settings
 
 
 
+
 def hello():
     print()
     print('================================================')
-    print('Салют! Я простой голосовой ассистент - Nonename')
+    print(colored('Салют! Я простой голосовой ассистент - Nonename', 'red'))
     print('================================================')
     print()
     say('Салют! Я простой голосовой ассистент - Nonename')
@@ -71,6 +73,8 @@ def say_print(*args: tuple):
         command = textopen[0]
         command_options = textopen[-1]
         command_with_name(command, command_options)
+    except wikipedia.exceptions.PageError:
+        pass
     except sr.UnknownValueError:
         print('Я Вас не поняла, повторите')
         say('Я Вас не поняла, повторите')
@@ -78,22 +82,33 @@ def say_print(*args: tuple):
 def hi_me(*args: tuple):
     if not args[0]:
         return
-    search_term = args[0]
     print('И тебе привет, Человек!')
     say('И тебе привет, Человек!')
 
-def help_u(*args: tuple):
+def help_u(*args: tuple): # ПЕРЕПИСАТЬ!
     if not args[0]:
         return
     say('Давайте, я расскажу, как со мной работать')
     time.sleep(3)
-    print(('По команде "открой" - я могу искать в гугле.\nПо команде "википедия" - готова зачитать 2 преложения.\nПо Команде " время" - подскажу который час\nПо команде "погода(город)" и выведу погоду\nПо команде "до связи" - я отключаюсь'))
-    say('По команде "открой" - я могу искать в гугле. По команде "википедия" - готова зачитать 2 предложения. Команде " время" - подскажу который час. По команде "погода(город)" и выведу погоду. Так же команде "до связи" - я отключаюсь')
-    time.sleep(15)
+    print('По команде "привет" -   желаю хорошего дня',
+    '\nПо команде "google" - открою браузер и покажу результаты поиска по запросу.',
+    '\nПо команде "видео" -  выведу результаты поиск на ютубе',
+    '\nПо команде "википедия" - готова зачитать 2 преложения.',
+    '\nПо команде "погода" - выведу погоду на сегодня',
+    '\nПо команде "до связи" - я отключаюсь')
+    strings = 'По команде "привет" -   желаю хорошего дня. По команде "google" - открою браузер и покажу результаты поиска по запросу.'
+    say(strings)
+    time.sleep(len(strings)*0.1)
+    strings1 = 'По команде "видео" -  выведу результаты поиск на ютубе.По команде "википедия" - готова зачитать 2 предложения.'
+    say(strings1)
+    time.sleep(len(strings1)*0.1)
+    strings2 = 'По команде "погода" - выведу погоду на сегодня. По команде "до связи" - я отключаюсь'
+    say(strings2)
+    time.sleep(len(strings2)*0.1)
 
 def open_search_youtube(*args: tuple):   
     # 
-    # открыввем гугл (реализовать открытие любой ссылки позже) 
+    # открываем гугл (реализовать открытие любой ссылки позже) 
     #
     if not args[0]:
         return
@@ -105,7 +120,7 @@ def open_search_youtube(*args: tuple):
     
 def open_search_google(*args: tuple):   
     # 
-    # открыввем гугл (реализовать открытие любой ссылки позже) 
+    # открыввем гугл 
     #
     if not args[0]:
         return
@@ -121,8 +136,9 @@ def wiki(*args: tuple):
     if not args[0]:
         return
     search_term = args[0]
+
     try:
-        print(wikipedia.search(search_term, results = 5, suggestion = True))
+        #print(wikipedia.search(search_term, results = 5, suggestion = True))
         wikitext = wikipedia.summary(search_term)
         all = tokenize.sent_tokenize(wikitext)[0:3]
         all = ''.join(map(str, all))
@@ -133,6 +149,38 @@ def wiki(*args: tuple):
     except wikipedia.exceptions.DisambiguationError as e:
         result = e.options 
         print(result)
+
+
+def get_weather(*args: tuple):
+
+    config_dict = get_default_config()
+    config_dict['language'] = 'ru' 
+
+    if args[0]:
+        city = args[0]
+        results = process.extractOne(city, cities)
+        if results[1] >= 80:
+            city = results[0]
+    else:
+        city = 'Москва'
+    try:
+        owm = OWM(settings.API, config_dict)
+        mgr = owm.weather_manager()
+        observation =  mgr.weather_at_place(city)
+        w = observation.weather
+        temper = w.temperature('celsius')
+        temper0, temper_max, temper_min = str(int(temper['temp'])), int(temper['temp_max']), int(temper['temp_min'])
+        print('Средняя температура. В настоящее время: ', temper0, 
+        '\nМаксимальная температура: ', temper_max,
+        '\nМинимальная температура: ', temper_min)
+        say(f'В {args[0]} cредняя температура за день:' + temper0)
+        time.sleep(2)
+    except:
+        pass
+
+cities = ['Москва', 'Санкт-Петербург', 'Краснодар', 'Сочи', 'Лондон', 'Париж', 'Нью-Йорк', 'Севастополь', 'Рим', 'Прага', 'Милан']
+
+
 
 def goodbye(*args: tuple):
     print('Ну пока')
@@ -145,18 +193,21 @@ def command_with_name(command, *args: list):
    
     for key in commands.keys():
         if command in key:
-            #fuzzw = fuzz.WRatio(key, command)
-            commands[key](*args)
+            comok = process.extractOne(command, key)
+            if comok[1] >= 80:
+                commands[key](*args)
         else:
-            pass       
+            pass  
 
 commands = {
     ('помоги', 'help', 'помощь'): help_u,
     ('найди', 'открой', 'google'): open_search_google, 
     ('видео', 'посмотреть', 'youtube' ): open_search_youtube,
-    ('вики', 'википедия', 'определение'): wiki,
-    ('чао', 'пока', 'стоп'): goodbye,
+    ('вики', 'википедия', 'определение', 'прочитай', 'расскажи'): wiki,
+    ('погода', 'прогноз'): get_weather,
+    ('чао', 'пока', 'стоп','пока-пока'): goodbye,
     ('привет', 'hi', 'здравствуй'): hi_me
+
 
 }
 
