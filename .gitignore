@@ -2,5 +2,4 @@
 nlp_venv/
 .vscode/*
 __pycache__/
-speak_copy.py
-speak_copy0.py
+settings.py
