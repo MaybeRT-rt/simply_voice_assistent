@@ -47,11 +47,35 @@ def say(text, lang = 'ru'):
         sound.play()
 
 
-reco = sr.Recognizer() 
-micro =  sr.Microphone(sample_rate = 48000, device_index=0, chunk_size=1024)
+# reco = sr.Recognizer() 
+# micro =  sr.Microphone(sample_rate = 48000, device_index=0, chunk_size=1024)
+
+def listenback():
+    print('Готовлюсь')
+    with micro as source:
+        reco.adjust_for_ambient_noise(source)
+    stop_listening = reco.listen_in_background(micro, callback)
+    for _ in range(50): 
+        time.sleep(0.1)
+
+
+
+def callback(stop_listening, audio):
+    try:
+        print('Услышала')
+        recognized_data = reco.recognize_google(audio, language='ru_RU').lower()
+        print(recognized_data)
+        if 'нина' in recognized_data:
+            stop_listening(wait_for_stop=False)
+            say_print()
+        else:
+            pass
+    except sr.UnknownValueError:
+        print('Я Вас не поняла, повторите')
+        say('Я Вас не поняла, повторите')
 
 def say_print(*args: tuple):
-    with micro as source: # сначала запустить test.py, что бы понять свой device_index
+    with micro as source: 
         print('Готовлюсь к работе.')
         # регулирование уровня окружающего шума(слушает фон)
         reco.adjust_for_ambient_noise(source, duration=2) #2
@@ -63,6 +87,9 @@ def say_print(*args: tuple):
         print('Услышала')
         say('Услышала')
         time.sleep(3)
+        recog_in_command(audio)
+
+def recog_in_command(audio, *args: tuple):
     try:
         # использование online-распознавания через Google 
         recognized_data = reco.recognize_google(audio, language='ru_RU')
@@ -73,8 +100,6 @@ def say_print(*args: tuple):
         command = textopen[0]
         command_options = (" ".join(textopen[1:len(textopen)]))
         command_with_name(command, command_options)
-    except wikipedia.exceptions.PageError:
-        pass
     except sr.UnknownValueError:
         print('Я Вас не поняла, повторите')
         say('Я Вас не поняла, повторите')
@@ -149,6 +174,8 @@ def wiki(*args: tuple):
     except wikipedia.exceptions.DisambiguationError as e:
         result = e.options 
         print(result)
+    except wikipedia.exceptions.PageError:
+        pass
 
 
 def get_weather(*args: tuple):
@@ -159,8 +186,9 @@ def get_weather(*args: tuple):
     if args[0]:
         city = args[0]
         results = process.extractOne(city, cities)
-        if results[1] >= 80:
+        if results[1] >= 70:
             city = results[0]
+            
     else:
         city = 'Москва'
     try:
@@ -217,7 +245,10 @@ if __name__ == '__main__':
 
     hello()
     
+    reco = sr.Recognizer() 
+    micro =  sr.Microphone(sample_rate = 48000, device_index=0, chunk_size=1024)
 
     while True:
-        say_print()
+        listenback()
         
+ 
