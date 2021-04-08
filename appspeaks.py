@@ -1,5 +1,5 @@
 import time
-import  subprocess
+import subprocess
 from fuzzywuzzy import process
 import webbrowser
 import wikipedia
@@ -9,11 +9,9 @@ from pyowm.utils.config import get_default_config
 import settings
 from lets_talk import say
 
-def open_site(args: tuple):
-    
-    if not args[0]:
-        return
-    site = args[0]
+def open_site(command_options=''):
+    #открываем сайты 
+    site = command_options
     results = process.extractOne(site, sites)
     if results[1] >= 90:
         site = results[0]
@@ -24,43 +22,37 @@ sites = ['vk.com', 'facebook.com', 'yandex.ru', 'bash.im']
 
 
 
-def open_search_youtube(*args: tuple):   
+def open_search_youtube(command_options, *args: tuple):   
     # 
-    # открываем гугл (реализовать открытие любой ссылки позже) 
+    # открываем youtube с запросом 
     #
-    if not args[0]:
-        return
-    search_term = args[0]
+    search_term = command_options
     url = "https://www.youtube.com/results?search_query=" + search_term
     webbrowser.open(url)
     say(f'Открываю {search_term} на ютубе')
    
 
-def open_search_google(*args: tuple):   
+def open_search_google(command_options, *args: tuple):   
     # 
     # открыввем гугл 
     #
-    if not args[0]:
-        return
-    search_term = args[0]
+    search_term = command_options
     print(search_term)
     url = "https://google.com/search?q=" + search_term
     webbrowser.open(url) 
     say(f'Ищу {search_term} в гугле')
 
-def wiki(*args: tuple):
+def wiki(command_options, *args: tuple):
     #
-    # Поиск по википедии
+    # Поиск по википедии и вывод результата
     #
     wikipedia.set_lang("ru")
-    if not args[0]:
-        return
-    search_term = args[0]
+    search_term = command_options
 
     try:
         #print(wikipedia.search(search_term, results = 5, suggestion = True))
         wikitext = wikipedia.summary(search_term)
-        all = tokenize.sent_tokenize(wikitext)[0:3]
+        all = tokenize.sent_tokenize(wikitext)[0:4]
         all = ''.join(map(str, all))
         len_all = len(all)
         print(all)
@@ -71,21 +63,15 @@ def wiki(*args: tuple):
         print(result)
     except wikipedia.exceptions.PageError:
         pass
+    except wikipedia.exceptions.WikipediaException:
+        pass
 
 
-def get_weather(*args: tuple):
-
+def get_weather(command_options, *args: tuple):
+    # погода
     config_dict = get_default_config()
     config_dict['language'] = 'ru' 
-
-    if args[0]:
-        city = args[0]
-        results = process.extractOne(city, cities)
-        if results[1] >= 70:
-            city = results[0]
-
-    else:
-        city = 'Москва'
+    city = command_options
     try:
         owm = OWM(settings.API, config_dict)
         mgr = owm.weather_manager()
@@ -93,12 +79,11 @@ def get_weather(*args: tuple):
         w = observation.weather
         temper = w.temperature('celsius')
         temper0, temper_max, temper_min = str(int(temper['temp'])), int(temper['temp_max']), int(temper['temp_min'])
-        print('Средняя температура. В настоящее время: ', temper0, 
+        print('Средняя температура: ', temper0, 
         '\nМаксимальная температура: ', temper_max,
         '\nМинимальная температура: ', temper_min)
-        say(f'В {args[0]} cредняя температура за день:' + temper0)
+        say(f'Средняя температура за день:' + temper0)
         time.sleep(2)
     except:
         pass
 
-cities = ['Москва', 'Санкт-Петербург', 'Краснодар', 'Сочи', 'Лондон', 'Париж', 'Нью-Йорк', 'Севастополь', 'Рим', 'Прага', 'Милан']
