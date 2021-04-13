@@ -6,8 +6,9 @@ import wikipedia
 from nltk import tokenize
 from pyowm.owm import OWM
 from pyowm.utils.config import get_default_config
-import settings
+from settings import API, filename
 from lets_talk import say
+from PIL import Image
 
 def open_site(command_options=''):
     #открываем сайты 
@@ -66,6 +67,10 @@ def wiki(command_options, *args: tuple):
     except wikipedia.exceptions.WikipediaException:
         pass
 
+def openfile(lentxt):
+    with Image.open(filename) as image:
+        image.show()
+        say('Мои создатели еще не сделали меня умным')
 
 def get_weather(command_options, *args: tuple):
     # погода
@@ -73,7 +78,7 @@ def get_weather(command_options, *args: tuple):
     config_dict['language'] = 'ru' 
     city = command_options
     try:
-        owm = OWM(settings.API, config_dict)
+        owm = OWM(API, config_dict)
         mgr = owm.weather_manager()
         observation =  mgr.weather_at_place(city)
         w = observation.weather
