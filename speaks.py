@@ -14,6 +14,7 @@ from appspeaks import  open_site, open_search_google, open_search_youtube, get_w
 from lets_talk import say
 from greetings import hi_me, hello, help_u, goodbye
 from cmdname import command_with_name, commands
+from chat import boltalka
 
 # инициализация инструментов распознавания и ввода речи
 
@@ -41,7 +42,10 @@ def recog_in(audio):
         # использование online-распознавания через Google 
         recognized_data = reco.recognize_google(audio, language='ru_RU').lower()
         print(f'Вы сказали: {recognized_data}')
-        remove_stopword(recognized_data)
+        if recognized_data == 'давай поболтаем':
+            boltalka()
+        else:
+            remove_stopword(recognized_data)
     except sr.UnknownValueError:
         print('Я Вас не поняла, повторите')
         say('Я Вас не поняла, повторите')
@@ -54,7 +58,6 @@ def remove_stopword(recognized_data):
     stop_words.extend(nltkstop) #объеденяем слова в списке для удаления
     filtered_words = [word for word in text if word not in stop_words] #убираем лишние слова
     filtered_words = str(" ".join(filtered_words))
-    print(filtered_words)
     recog_in_commands(filtered_words)
 
 def recog_in_commands(filtered_words):

@@ -1,5 +1,6 @@
 import time
 import sys
+from PIL import Image
 from termcolor import colored
 from lets_talk import say
 
@@ -36,7 +37,6 @@ def help_u(lentxt):
     strings2 = 'По команде "погода" - выведу погоду на сегодня. По команде "до связи" - я отключаюсь'
     say(strings2)
     time.sleep(len(strings2)*0.1)
-
 
 def goodbye(lentxt):
     print('Ну пока')

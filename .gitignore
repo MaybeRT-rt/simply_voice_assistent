@@ -3,3 +3,4 @@ nlp_venv/
 .vscode/*
 __pycache__/
 settings.py
+good.tsv
