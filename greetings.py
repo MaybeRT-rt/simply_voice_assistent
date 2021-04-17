@@ -14,11 +14,11 @@ def hello():
     time.sleep(3)
 
 
-def hi_me(lentxt):
+def hi_me():
     print('И тебе привет, Человек!')
     say('И тебе привет, Человек!')
 
-def help_u(lentxt): 
+def help_u(): 
     say('Давайте, я расскажу, как со мной работать')
     time.sleep(3)
     print('По команде "привет" -   желаю хорошего дня',
@@ -38,7 +38,7 @@ def help_u(lentxt):
     time.sleep(len(strings2)*0.1)
 
 
-def goodbye(lentxt):
+def goodbye():
     print('Ну пока')
     say('Ну пока')
     time.sleep(2)

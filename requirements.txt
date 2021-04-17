@@ -22,7 +22,7 @@ geojson==2.5.0
 google-auth==1.28.0
 google-auth-oauthlib==0.4.4
 google-pasta==0.2.0
-grpcio==1.32.0
+
 gTTS==2.2.2
 h5py==2.10.0
 idna==2.10
@@ -74,7 +74,7 @@ SpeechRecognition==3.8.1
 stop-words==2018.7.23
 tensorboard==2.4.1
 tensorboard-plugin-wit==1.8.0
-tensorflow==2.4.1
+
 tensorflow-estimator==2.4.0
 termcolor==1.1.0
 tflearn==0.5.0
@@ -83,5 +83,5 @@ tqdm==4.59.0
 typing-extensions==3.7.4.3
 urllib3==1.26.3
 Werkzeug==1.0.1
-wikipedia==1.4.0
+
 wrapt==1.12.1
