@@ -23,8 +23,13 @@
  #### Что используем в проекте
 | Умение | Зависимости |
 |--------|:-----------:|
-| Слушать микрофон | pip install PyAudio (использование микрофона) |
-
+| Для использования микрофона | pip install PyAudio |
+| Speech-to-text | pip install speech_recognition |
+| gTTS (Google Text-to-Speech) | pip install gTTS |
+| Для воиспроизвдения звука | pip install pygame |
+| Для работы с текстом команд | pip install nltk (для работы stopwords, смотрите ниже) |
+| Для нечеткого сравнения текста команды с командами в списке | pip install fuzzywuzzy |
+| Для лемматизации текста | pip install pymystem3 |
 
  
  #### Проверка проекта
