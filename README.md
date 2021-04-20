@@ -22,9 +22,11 @@
  
  #### Проверка проекта
  
+ Установка библиотек
 ```
  pip install -r requirements.txt 
 ```
+Для удаления stopwords из команды
 ```
 >>> import nltk
 >>> nltk.download('stopwords')
