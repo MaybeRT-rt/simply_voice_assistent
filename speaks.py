@@ -1,6 +1,8 @@
 import speech_recognition as sr #распознавение пользовательской речи (speech to text)
 import sys 
 import pyaudio
+import nltk
+nltk.download('stopwords')
 import time
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
@@ -25,13 +27,13 @@ mystem = Mystem()
 def say_print(*args: tuple):
     with micro as source: 
         print('Готовлюсь к работе.')
-        input('Нажмите на enter для продолжения')
+        #input('Нажмите на enter для продолжения')
         # регулирование уровня окружающего шума(слушает фон)
         reco.adjust_for_ambient_noise(source, duration=2) #2
         print('Слушаю...')
         say('Слушаю...')
         #задержка записи
-        reco.pause_threshold = 1
+        reco.pause_threshold = 2
         audio = reco.listen(source)
         print('Услышала')
         recog_in(audio)

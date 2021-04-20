@@ -1,6 +1,6 @@
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
-from appspeaks import  open_site, open_search_google, open_search_youtube, get_weather, wiki
+from appspeaks import  open_site, open_search_google, calculat, open_search_youtube, get_weather, wiki
 from greetings import hi_me, hello, help_u, goodbye
 
 def command_with_name(lentxt):
@@ -25,6 +25,10 @@ commands = {
     ('вики', 'википедия', 'определение', 'читать', 'прочитай', 'прочитывать', 'рассказать', 'рассказывать'): wiki,
     ('погода', 'прогноз'): get_weather,
     ('пока-пока', 'чао'): goodbye,
-    ('привет-привет', 'здравствовать'): hi_me
+    ('привет-привет', 'здравствовать'): hi_me,
+    ('сколько будет', 'посчитай'): calculat
     
 }
+
+
+#    ('сколько будет', 'посчитай'): calculat
